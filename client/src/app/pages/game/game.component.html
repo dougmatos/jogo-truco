@@ -1,0 +1,280 @@
+@if (state(); as s) {
+
+  <!-- ===================== SALA DE ESPERA ===================== -->
+  @if (s.status === 'waiting') {
+    <div class="waiting">
+      <div class="glass waiting-card">
+        <img src="assets/logo.svg" alt="" class="logo-sm" />
+        <h2>Sala criada!</h2>
+        <p class="hint">Compartilhe o código com {{ s.mode === 2 ? 'seu adversário' : 'os outros jogadores' }}:</p>
+        <button class="room-code" (click)="copyCode()">
+          {{ s.roomId }}
+          <small>{{ copied() ? '✅ copiado!' : '📋 copiar' }}</small>
+        </button>
+
+        <div class="player-slots">
+          @for (i of [].constructor(s.mode); track $index) {
+            @if (s.players[$index]; as p) {
+              <div class="slot filled" [class.team-a]="p.team === 'A'" [class.team-b]="p.team === 'B'">
+                <span class="avatar" [class.bot-av]="p.isBot">{{ avatarOf(p) }}</span>
+                <span class="pname">{{ p.name }}</span>
+                <span class="pteam">Time {{ p.team === 'A' ? '🔵' : '🟠' }}</span>
+              </div>
+            } @else {
+              <div class="slot">
+                <span class="avatar empty-av">?</span>
+                <span class="pname dim">aguardando…</span>
+              </div>
+            }
+          }
+        </div>
+
+        <p class="hint pulse">Esperando jogadores ({{ s.players.length }}/{{ s.mode }})…</p>
+        <p class="hint">Baralho {{ s.deck === 'sujo' ? '🔄 sujo (manilha de vira)' : '✨ limpo (manilhas fixas)' }}</p>
+        <button class="btn-success" (click)="addBot()">🤖 Adicionar bot</button>
+        <button class="btn-ghost" (click)="leave()">← Sair da sala</button>
+      </div>
+    </div>
+  }
+
+  <!-- ===================== MESA DE JOGO ===================== -->
+  @if (s.status !== 'waiting' && game(); as g) {
+    <div class="game">
+
+      <!-- Barra superior -->
+      <header class="topbar">
+        <div class="brand">
+          <img src="assets/logo.svg" alt="" />
+          <span class="code">{{ s.roomId }}</span>
+        </div>
+
+        <div class="scoreboard glass">
+          <div class="score us">
+            <small>NÓS</small>
+            <strong>{{ myScore() }}</strong>
+          </div>
+          <div class="mid">
+            <span class="hand-value" [class.hot]="g.handValue > 1">vale {{ g.handValue }}</span>
+            <div class="vaza-dots">
+              @for (d of vazaDots(); track $index) {
+                <span class="dot" [class]="d"></span>
+              }
+            </div>
+          </div>
+          <div class="score them">
+            <small>ELES</small>
+            <strong>{{ theirScore() }}</strong>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="btn-ghost sm" (click)="chatOpen.set(!chatOpen())">💬</button>
+          <button class="btn-ghost sm" (click)="leave()">Sair</button>
+        </div>
+      </header>
+
+      <!-- Mesa -->
+      <main class="table-area">
+        <div class="felt">
+          <div class="felt-ring"></div>
+
+          <!-- Oponentes / parceiro -->
+          @for (pos of ['top', 'left', 'right']; track pos) {
+            @if (playerAt(pos); as p) {
+              <div class="seat" [class]="'seat-' + pos">
+                <div class="badge" [class.turn]="isTurn(p.seat)"
+                     [class.team-a]="p.team === 'A'" [class.team-b]="p.team === 'B'">
+                  <span class="avatar" [class.bot-av]="p.isBot">{{ avatarOf(p) }}</span>
+                  <span class="pname">{{ p.name }}</span>
+                </div>
+                <div class="mini-hand">
+                  @for (c of cardCount(p.seat); track $index) {
+                    <app-card [faceDown]="true" [width]="42" />
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          <!-- Vira (baralho sujo) -->
+          @if (g.vira) {
+            <div class="vira">
+              <app-card [card]="g.vira" [width]="56" />
+              <span class="vira-label">Vira • manilha: {{ g.manilhaRank }}</span>
+            </div>
+          }
+
+          <!-- Cartas jogadas na vaza -->
+          <div class="played">
+            @for (pos of ['bottom', 'top', 'left', 'right']; track pos) {
+              @if (tableCardAt(pos); as play) {
+                <div class="played-card" [class]="'played-' + pos">
+                  <app-card [card]="play.card" [faceDown]="play.faceDown"
+                            [manilhaRank]="g.manilhaRank" [width]="92" />
+                </div>
+              }
+            }
+            @if (displayTable().length === 0 && !g.winner) {
+              <span class="felt-logo">TRUCO</span>
+            }
+          </div>
+
+          <!-- Você -->
+          <div class="seat seat-bottom">
+            <div class="badge me" [class.turn]="isTurn(s.you.seat)"
+                 [class.team-a]="s.you.team === 'A'" [class.team-b]="s.you.team === 'B'">
+              <span class="avatar">{{ s.you.name.charAt(0).toUpperCase() }}</span>
+              <span class="pname">{{ s.you.name }} (você)</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Sua mão + ações -->
+      <footer class="hand-bar">
+        <div class="actions-left">
+          @if (g.vazaResults.length > 0 && canPlay()) {
+            <label class="facedown-toggle" [class.on]="playFaceDown">
+              <input type="checkbox" [(ngModel)]="playFaceDown" />
+              🂠 Jogar coberta
+            </label>
+          }
+        </div>
+
+        <div class="my-cards" [class.my-turn]="canPlay()">
+          @for (card of g.yourCards; track $index) {
+            <button class="card-btn" (click)="play($index)" [disabled]="!canPlay()">
+              <app-card [card]="card" [manilhaRank]="g.manilhaRank" [width]="110" />
+            </button>
+          }
+        </div>
+
+        <div class="actions-right">
+          <button class="truco-btn" (click)="truco()" [disabled]="!g.canTruco">
+            {{ trucoLabel() }}
+          </button>
+        </div>
+      </footer>
+
+      <!-- Banner de TRUCO -->
+      @if (trucoBanner()) {
+        <div class="truco-banner display">{{ trucoBanner() }}</div>
+      }
+
+      <!-- Toasts -->
+      <div class="toasts">
+        @for (t of toasts(); track t.id) {
+          <div class="toast" [class]="t.kind">{{ t.text }}</div>
+        }
+      </div>
+
+      <!-- Modal: responder truco -->
+      @if (mustRespondTruco() && g.pendingTruco; as pt) {
+        <div class="overlay">
+          <div class="glass modal pop">
+            <h2 class="display">🔥 {{ nameOf(pt.bySeat) }} pediu!</h2>
+            <p>A mão passa a valer <strong>{{ pt.value }} pontos</strong>. E aí?</p>
+            <div class="modal-actions">
+              <button class="btn-success" (click)="socket.respondTruco('accept')">Aceitar 💪</button>
+              @if (raiseLabel()) {
+                <button class="btn-primary" (click)="socket.respondTruco('raise')">{{ raiseLabel() }} 😈</button>
+              }
+              <button class="btn-danger" (click)="socket.respondTruco('fold')">Correr 🏃</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Modal: mão de onze -->
+      @if (mustDecideMaoDeOnze()) {
+        <div class="overlay">
+          <div class="glass modal pop">
+            <h2 class="display">😱 Mão de onze!</h2>
+            <p>Vocês têm 11 pontos. Jogar esta mão valendo <strong>3</strong> ou correr e dar <strong>1</strong> ponto pra eles?</p>
+            @if (g.teammateCards; as tc) {
+              <p class="dim">Cartas do seu parceiro:</p>
+              <div class="teammate-cards">
+                @for (c of tc; track $index) {
+                  <app-card [card]="c" [manilhaRank]="g.manilhaRank" [width]="76" />
+                }
+              </div>
+            }
+            <div class="modal-actions">
+              <button class="btn-success" (click)="socket.maoDeOnze(true)">Jogar! 🔥</button>
+              <button class="btn-danger" (click)="socket.maoDeOnze(false)">Correr 🏃</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (waitingMaoDeOnze()) {
+        <div class="overlay soft">
+          <div class="glass modal">
+            <h2 class="display">Mão de onze…</h2>
+            <p class="pulse">Aguardando a decisão dos adversários ⏳</p>
+          </div>
+        </div>
+      }
+
+      <!-- Fim de jogo -->
+      @if (g.winner) {
+        <div class="overlay">
+          <div class="glass modal pop">
+            <h1 class="display" [class.win-title]="won()" [class.lose-title]="!won()">
+              {{ won() ? '🏆 VITÓRIA!' : '😭 DERROTA' }}
+            </h1>
+            <p class="final-score">{{ myScore() }} × {{ theirScore() }}</p>
+            <div class="modal-actions">
+              <button class="btn-primary" (click)="playAgain()">Jogar novamente 🔁</button>
+              <button class="btn-ghost" (click)="leave()">Sair</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Chat -->
+      @if (chatOpen()) {
+        <aside class="chat glass">
+          <header>
+            <strong>💬 Chat</strong>
+            <button class="btn-ghost sm" (click)="chatOpen.set(false)">✕</button>
+          </header>
+          <div class="messages">
+            @for (m of socket.chat(); track $index) {
+              <p><strong [class.me-msg]="m.seat === s.you.seat">{{ m.name }}:</strong> {{ m.message }}</p>
+            }
+          </div>
+          <div class="chat-input">
+            <input [(ngModel)]="chatText" placeholder="Mensagem…" (keyup.enter)="sendChat()" maxlength="200" />
+            <button class="btn-primary sm" (click)="sendChat()">➤</button>
+          </div>
+        </aside>
+      }
+
+      <!-- Erro do servidor -->
+      @if (socket.errorMsg(); as err) {
+        <div class="server-error">{{ err }}</div>
+      }
+    </div>
+  }
+
+  <!-- Jogador saiu -->
+  @if (socket.playerLeft(); as name) {
+    <div class="overlay">
+      <div class="glass modal pop">
+        <h2 class="display">Eita…</h2>
+        <p><strong>{{ name }}</strong> saiu da partida. 😕</p>
+        <div class="modal-actions">
+          <button class="btn-primary" (click)="backToLobby()">Voltar ao lobby</button>
+        </div>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="waiting">
+    <div class="glass waiting-card">
+      <p>Conectando…</p>
+      <button class="btn-ghost" (click)="backToLobby()">← Voltar ao lobby</button>
+    </div>
+  </div>
+}

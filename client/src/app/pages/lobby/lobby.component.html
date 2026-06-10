@@ -1,0 +1,83 @@
+<div class="lobby">
+  <header class="hero">
+    <img src="assets/logo.svg" alt="Truco Online" class="logo" />
+    <h1>Truco <span>Online</span></h1>
+    <p>Truco Paulista • Jogue com os amigos em salas 1x1 ou 2x2</p>
+  </header>
+
+  @if (error()) {
+    <div class="toast-error">{{ error() }}</div>
+  }
+
+  <div class="panels">
+    <!-- Criar sala -->
+    <section class="glass panel">
+      <h2>🎴 Criar sala</h2>
+      <label>Seu apelido</label>
+      <input [(ngModel)]="name" maxlength="20" placeholder="Ex.: Zé do Truco" (keyup.enter)="create()" />
+
+      <label>Modo de jogo</label>
+      <div class="mode-picker">
+        <button class="mode" [class.active]="mode === 2" (click)="mode = 2">
+          <span class="mode-icon">⚔️</span>
+          <strong>1 x 1</strong>
+          <small>2 jogadores</small>
+        </button>
+        <button class="mode" [class.active]="mode === 4" (click)="mode = 4">
+          <span class="mode-icon">👥</span>
+          <strong>2 x 2</strong>
+          <small>4 jogadores</small>
+        </button>
+      </div>
+
+      <label>Baralho</label>
+      <div class="mode-picker">
+        <button class="mode" [class.active]="deck === 'limpo'" (click)="deck = 'limpo'">
+          <span class="mode-icon">✨</span>
+          <strong>Limpo</strong>
+          <small>manilhas fixas</small>
+        </button>
+        <button class="mode" [class.active]="deck === 'sujo'" (click)="deck = 'sujo'">
+          <span class="mode-icon">🔄</span>
+          <strong>Sujo</strong>
+          <small>manilha de vira</small>
+        </button>
+      </div>
+
+      <button class="btn-primary full" (click)="create()" [disabled]="busy()">
+        Criar sala
+      </button>
+      <button class="btn-success full" (click)="create(true)" [disabled]="busy()">
+        🤖 Jogar contra o computador
+      </button>
+    </section>
+
+    <!-- Entrar em sala -->
+    <section class="glass panel">
+      <h2>🚪 Entrar em sala</h2>
+      <label>Código da sala</label>
+      <div class="join-row">
+        <input [(ngModel)]="joinCode" maxlength="4" placeholder="ABCD"
+               class="code-input" (keyup.enter)="join()" />
+        <button class="btn-success" (click)="join()" [disabled]="busy()">Entrar</button>
+      </div>
+
+      <h3>Salas abertas</h3>
+      <div class="rooms">
+        @for (room of socket.rooms(); track room.id) {
+          <button class="room" (click)="join(room.id)">
+            <span class="room-code">{{ room.id }}</span>
+            <span class="room-host">{{ room.hostName }}</span>
+            <span class="room-mode">{{ room.mode === 2 ? '1x1' : '2x2' }}</span>
+            <span class="room-deck">{{ room.deck === 'sujo' ? '🔄 sujo' : '✨ limpo' }}</span>
+            <span class="room-count">{{ room.players }}/{{ room.capacity }}</span>
+          </button>
+        } @empty {
+          <p class="empty">Nenhuma sala aberta no momento.<br>Crie a sua e chame a galera! 🃏</p>
+        }
+      </div>
+    </section>
+  </div>
+
+  <footer>Manilhas fixas: 4♣ &gt; 7♥ &gt; A♠ &gt; 7♦ • Partida até 12 pontos</footer>
+</div>

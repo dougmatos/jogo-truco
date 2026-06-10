@@ -1,0 +1,9 @@
+services:
+  truco:
+    build: .
+    container_name: truco-online
+    environment:
+      PORT: 3099
+    ports:
+      - "3099:3099"
+    restart: unless-stopped

@@ -1,23 +1,24 @@
-/* ===== Truco Online — tema global (esmeralda, dourado e marfim) ===== */
+/* ===== Truco Online — tema global (azul-meia-noite, ciano e marfim) ===== */
 :root {
-  --bg-1: #0a110e;
-  --bg-2: #101d17;
-  --bg-3: #15261d;
-  --felt-1: #1d4a37;
-  --felt-2: #0f2e21;
-  --accent: #d8b45a;
-  --accent-2: #a8842c;
-  --pink: #9e3548;
-  --purple: #574f72;
-  --blue: #6f8ab0;
-  --teal: #3e8e7e;
+  --bg-1: #060b18;
+  --bg-2: #0a1428;
+  --bg-3: #0e1d3a;
+  --felt-1: #14407a;
+  --felt-2: #0a1f44;
+  --accent: #4aa8ff;
+  --accent-2: #1f6fd6;
+  --cyan: #38e1d6;
+  --pink: #e0577d;
+  --purple: #6d6fd6;
+  --blue: #6f9ee0;
+  --teal: #2fb8c4;
   --card-w: 110px;
-  --glass: rgba(244, 241, 232, 0.05);
-  --glass-border: rgba(216, 180, 90, 0.22);
-  --text: #f4f1e8;
-  --text-dim: rgba(244, 241, 232, 0.58);
-  --serif: 'Playfair Display', Georgia, serif;
-  --sans: 'Inter', system-ui, sans-serif;
+  --glass: rgba(150, 190, 255, 0.06);
+  --glass-border: rgba(110, 165, 255, 0.22);
+  --text: #eef4ff;
+  --text-dim: rgba(206, 222, 255, 0.6);
+  --serif: 'Bricolage Grotesque', Georgia, serif;
+  --sans: 'Manrope', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,9 +29,10 @@ body {
   font-family: var(--sans);
   color: var(--text);
   background:
-    radial-gradient(1100px 650px at 85% -10%, rgba(216, 180, 90, 0.08), transparent 60%),
-    radial-gradient(900px 600px at -10% 110%, rgba(62, 142, 126, 0.12), transparent 60%),
-    linear-gradient(150deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+    radial-gradient(1100px 650px at 85% -10%, rgba(74, 168, 255, 0.16), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(56, 225, 214, 0.12), transparent 60%),
+    radial-gradient(700px 500px at 50% 50%, rgba(109, 111, 214, 0.06), transparent 70%),
+    linear-gradient(155deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
   background-attachment: fixed;
   overflow-x: hidden;
 }
@@ -38,7 +40,7 @@ body {
 h1, h2, .display {
   font-family: var(--serif);
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: -0.5px;
 }
 
 button {
@@ -55,9 +57,9 @@ button:active:not(:disabled) { transform: translateY(0); }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
-  background: linear-gradient(160deg, #e7cd85, var(--accent) 45%, var(--accent-2));
-  color: #241a05;
-  box-shadow: 0 4px 18px rgba(216, 180, 90, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background: linear-gradient(160deg, #6dc0ff, var(--accent) 45%, var(--accent-2));
+  color: #04122b;
+  box-shadow: 0 6px 22px rgba(74, 168, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   padding: 14px 28px;
   font-size: 1rem;
 }
@@ -78,10 +80,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .btn-success {
-  background: linear-gradient(160deg, #59a896, var(--teal) 55%, #27604f);
-  color: #eafaf4;
+  background: linear-gradient(160deg, #4fe6d6, var(--cyan) 50%, #16a89c);
+  color: #032722;
   padding: 12px 22px;
-  box-shadow: 0 4px 16px rgba(62, 142, 126, 0.3);
+  box-shadow: 0 6px 18px rgba(56, 225, 214, 0.32);
 }
 
 input, select {
@@ -98,16 +100,16 @@ input, select {
 input::placeholder { color: var(--text-dim); }
 input:focus, select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(216, 180, 90, 0.18);
+  box-shadow: 0 0 0 3px rgba(74, 168, 255, 0.22);
 }
 select option { background: var(--bg-2); }
 
 .glass {
-  background: linear-gradient(170deg, rgba(244, 241, 232, 0.07), rgba(244, 241, 232, 0.03));
+  background: linear-gradient(170deg, rgba(120, 170, 255, 0.1), rgba(120, 170, 255, 0.03));
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(2, 8, 26, 0.55), inset 0 1px 0 rgba(180, 210, 255, 0.12);
 }
 
 @keyframes pop-in {
@@ -120,8 +122,8 @@ select option { background: var(--bg-2); }
   to { transform: translateY(0); opacity: 1; }
 }
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(216, 180, 90, 0.35); }
-  50% { box-shadow: 0 0 26px rgba(216, 180, 90, 0.65); }
+  0%, 100% { box-shadow: 0 0 10px rgba(74, 168, 255, 0.4); }
+  50% { box-shadow: 0 0 28px rgba(74, 168, 255, 0.7); }
 }
 @keyframes shake {
   0%, 100% { transform: rotate(0); }

@@ -12,7 +12,7 @@
   <div class="panels">
     <!-- Criar sala -->
     <section class="glass panel">
-      <h2>🎴 Criar sala</h2>
+      <h2><span class="ic">🎴</span> Criar sala</h2>
       <label>Seu apelido</label>
       <input [(ngModel)]="name" maxlength="20" placeholder="Ex.: Zé do Truco" (keyup.enter)="create()" />
 
@@ -54,12 +54,12 @@
 
     <!-- Entrar em sala -->
     <section class="glass panel">
-      <h2>🚪 Entrar em sala</h2>
+      <h2><span class="ic">🚪</span> Entrar em sala</h2>
       <label>Código da sala</label>
       <div class="join-row">
         <input [(ngModel)]="joinCode" maxlength="4" placeholder="ABCD"
                class="code-input" (keyup.enter)="join()" />
-        <button class="btn-success" (click)="join()" [disabled]="busy()">Entrar</button>
+        <button class="btn-success join-btn" (click)="join()" [disabled]="busy()">Entrar</button>
       </div>
 
       <h3>Salas abertas</h3>

@@ -11,12 +11,13 @@
   text-align: center;
   animation: slide-up 0.5s ease;
 
-  .logo { width: 110px; filter: drop-shadow(0 10px 28px rgba(216, 180, 90, 0.35)); }
+  .logo { width: 110px; filter: drop-shadow(0 10px 30px rgba(74, 168, 255, 0.45)); }
 
   h1 {
-    font-size: clamp(2.6rem, 7vw, 4.2rem);
+    font-size: clamp(2.6rem, 7vw, 4.4rem);
     margin-top: 8px;
-    background: linear-gradient(100deg, #efdc9d, #d8b45a 45%, #a8842c);
+    letter-spacing: -1.5px;
+    background: linear-gradient(100deg, #bfe2ff, #4aa8ff 45%, #1f6fd6);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -33,12 +34,12 @@
 }
 
 .toast-error {
-  background: linear-gradient(160deg, #b9485e, var(--pink) 55%, #6e2433);
+  background: linear-gradient(160deg, #e0577d, var(--pink) 55%, #8c2e47);
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 600;
   animation: pop-in 0.25s ease;
-  box-shadow: 0 8px 24px rgba(158, 53, 72, 0.4);
+  box-shadow: 0 8px 24px rgba(224, 87, 125, 0.4);
 }
 
 .panels {
@@ -51,15 +52,44 @@
 }
 
 .panel {
+  position: relative;
   padding: 28px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
   animation: slide-up 0.5s ease;
 
-  h2 { font-size: 1.5rem; margin-bottom: 6px; }
+  /* sutil brilho azul no topo do card */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), transparent);
+    opacity: 0.7;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .ic {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      background: rgba(74, 168, 255, 0.14);
+      border: 1px solid var(--glass-border);
+    }
+  }
   h3 { margin-top: 14px; font-size: 1rem; color: var(--text-dim); }
-  label { font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin-top: 6px; }
+  label { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin-top: 6px; }
 }
 
 .mode-picker {
@@ -84,7 +114,7 @@
 
     &.active {
       border-color: var(--accent);
-      background: rgba(216, 180, 90, 0.1);
+      background: rgba(74, 168, 255, 0.14);
       animation: pulse-glow 2.4s infinite;
     }
   }
@@ -95,14 +125,22 @@
 .join-row {
   display: flex;
   gap: 10px;
+  align-items: stretch;
 
   .code-input {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0; /* impede o overflow do flex item — corrige o layout quebrado */
     text-transform: uppercase;
-    letter-spacing: 8px;
+    letter-spacing: 0.4em;
+    text-indent: 0.4em; /* compensa o letter-spacing à direita p/ centralizar */
     font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     text-align: center;
+  }
+
+  .join-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 }
 
@@ -125,6 +163,8 @@
     border-radius: 12px;
     text-align: left;
 
+    &:hover { border-color: var(--accent); background: rgba(74, 168, 255, 0.1); }
+
     .room-code {
       font-family: var(--serif);
       font-weight: 700;
@@ -134,7 +174,7 @@
     }
     .room-host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .room-mode {
-      background: var(--purple);
+      background: rgba(109, 111, 214, 0.45);
       padding: 2px 10px;
       border-radius: 999px;
       font-size: 0.78rem;
@@ -145,7 +185,7 @@
       color: var(--text-dim);
       white-space: nowrap;
     }
-    .room-count { color: var(--teal); font-weight: 700; }
+    .room-count { color: var(--cyan); font-weight: 700; }
   }
 
   .empty {

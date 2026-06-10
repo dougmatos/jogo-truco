@@ -31,7 +31,7 @@ O deploy via GitHub Actions usa SSH com senha. Configure estes secrets no reposi
 - `VPS_PASSWORD`
 - `LETSENCRYPT_EMAIL` (opcional, usado pelo Certbot)
 
-No VPS, o script `scripts/check-vps.sh` prepara o nginx para publicar o dominio `truco.dougm.dev` com TLS do Let's Encrypt e encaminhar para `127.0.0.1:3099`. Para a primeira emissao do certificado funcionar, o DNS do dominio precisa apontar para o VPS e as portas 80/443 precisam estar liberadas.
+No VPS, o script `scripts/check-vps.sh` prepara o nginx para publicar o dominio `truco.dougm.dev` com TLS do Let's Encrypt e encaminhar para `127.0.0.1:3099`. Depois, `scripts/deploy-container.sh` garante Docker/Compose e sobe o container. Para a primeira emissao do certificado funcionar, o DNS do dominio precisa apontar para o VPS e as portas 80/443 precisam estar liberadas.
 
 ### Em modo de desenvolvimento
 

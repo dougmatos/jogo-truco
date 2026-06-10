@@ -38,4 +38,4 @@ jobs:
             git reset --hard "origin/$BRANCH"
 
             bash scripts/check-vps.sh
-            docker compose up -d --build
+            bash scripts/deploy-container.sh
